@@ -1,57 +1,56 @@
-create database e_commerce_sales;
+CREATE database e_commerce_sales;
 use e_commerce_sales;
 
-create table Customers(
-      customer_id int primary key auto_increment,
+CREATE TABLE Customers(
+      customer_id int PRIMARY KEY auto_increment,
       customer_name varchar(30),
-      gender varchar(10) check (gender in("Male",'Female','Other')),
+      gender varchar(10) CHECK (gender IN ("Male",'Female','Other')),
       age int,
       city varchar(50),
-      state varchar(50)
+      STATE varchar(50)
 );
 
-create table Categories(
-	category_id int primary key auto_increment,
+CREATE TABLE Categories(
+	category_id int PRIMARY KEY auto_increment,
 	category_name varchar(30)
 );
 
-create table Products(
-	product_id int primary key auto_increment ,
+CREATE TABLE Products(
+	product_id int PRIMARY KEY auto_increment ,
 	product_name varchar(50),
 	category_id int,
     price decimal(10,2),
 	cost decimal(10,2),
 	stock_quantity int,
-	foreign key(category_id) references Categories(category_id)
+	FOREIGN KEY((category_id) REFERENCES Categories(category_id)
 );
         
-create table Orders(
-	order_id int primary key auto_increment,
+CREATE TABLE Orders(
+	order_id int PRIMARY KEY auto_increment,
 	customer_id int,
 	order_date date,
 	order_status varchar(20),
 	payment_method varchar(20),
-	foreign key (customer_id) references customers(customer_id)
+	FOREIGN KEY( (customer_id) REFERENCES customers(customer_id)
 );
-
-create table Order_Details(
-	order_detail_id int primary key auto_increment,
+CREATE TABLE Order_Details(
+	order_detail_id int PRIMARY KEY auto_increment,
     order_id int,
     product_id int,
     quantity int,
     unit_price decimal(10,2),
-    discount decimal(5,2) default 0,
-    foreign key(order_id) references Orders(order_id),
-    foreign key(product_id) references Products(product_id)
+    discount decimal(5,2) DEFAULT 0,
+    FOREIGN KEY((order_id) REFERENCES Orders(order_id),
+    FOREIGN KEY((product_id) REFERENCES Products(product_id)
 );
 
 CREATE table Payment(
-	payment_id int primary key auto_increment,
+	payment_id int PRIMARY KEY auto_increment,
     order_id int,
     payment_date date,
     payment_amount decimal(10,2),
     payment_status varchar(30),
-    foreign key(order_id) references orders(order_id)
+    FOREIGN KEY(order_id) REFERENCES orders(order_id)
 );
       
 INSERT INTO Customers(customer_name, gender, age, city, state)
@@ -184,35 +183,35 @@ VALUES
 (20, '2025-03-30', 0.00, 'Pending');
 
 -- show all customers
-select * from customers;
+SELECT * FROM customers;
 
 -- Show only Customer names
-select customer_name from customers;
+SELECT customer_name FROM customers;
 
 --  Insert new customer
 INSERT INTO Customers(customer_name, gender, age, city, state)
 VALUES('Sakthi', 'Male', 25, 'Vellore', 'Tamil Nadu');
 
 --  Update product price
-update products
-set price=79999.00
-where product_id=1;
+UPDATE products
+SET price=79999.00
+WHERE product_id=1;
 
 --  Find customers above a certain age
-select * from customers
-where age >30;
+SELECT * FROM customers
+WHERE age >30;
 
 --  Count total customers
 SELECT COUNT(*) AS total_customers FROM Customers;
 
 --  Find average product price
-select avg(price) as average_price from products;
+SELECT avg(price) AS average_price FROM products;
 
 --  Find maximum/minimum product price
-select max(price) as max_price,min(price)as min_price from products;
+SELECT max(price) AS max_price,min(price) AS min_price FROM products;
 
 --  Find male/female customers
-select * from Customers where gender="male" or gender="female";
+SELECT * FROM Customers WHERE gender="male" OR gender="female";
 
 -- Find products between ₹10,000 and ₹50,000
 SELECT * FROM Products
@@ -227,15 +226,15 @@ SELECT * FROM Customers
 WHERE city NOT IN ('Chennai', 'Mumbai');
 
 -- Sort products by price
-select * from products
-order by price;
+SELECT * FROM products
+ORDER BY price;
 
 -- Find products with low stock
-select * from products
-where stock_quantity <15;
+SELECT * FROM products
+WHERE stock_quantity <15;
 
 -- total sales
-select Sum(quantity*unit_price*(1-discount/100)) as Total_Sales from order_details;
+SELECT Sum(quantity*unit_price*(1-discount/100)) AS Total_Sales FROM order_details;
 
 -- Customers who spent more than ₹50,000
 SELECT
@@ -263,13 +262,13 @@ GROUP BY c.category_name
 ORDER BY total_sales DESC;
 
 -- Sales by customer
-select c.customer_id,c.customer_name,
+SELECT c.customer_id,c.customer_name,
 	SUM(od.quantity * od.unit_price * (1-discount/100)) as total_sales from customers c
 JOIN orders o
 	ON c.customer_id = o.customer_id
 JOIN order_details od
 	ON od.order_id=o.order_id
-group by c.customer_id
+GROUP BY c.customer_id
 order by total_sales desc;
 
 -- Top-selling products
